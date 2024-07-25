@@ -12,17 +12,20 @@ class AuthController extends Controller
 {
     public function signup(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string',
-        ]);
+        try{
+            $request->validate([
+                'email' => 'required|string|email|unique:users',
+                'password' => 'required|string',
+            ]);
+        } catch(\Exception $e){
+            return $e->getMessage();
+        }
         $user = new User([
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
         $user->save();
-        return response()->json([
-            'message' => 'Usuario creado correctamente!'], 201);
+        return response('Usuario creado correctamente!', 201);
     }
 
     public function login(Request $request)
@@ -32,11 +35,11 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
         $user = User::where('email', $request->email)->first();
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas no son correctas.'],
-                'password' => ['Las credenciales proporcionadas no son correctas.'],
-            ]);
+        if ($user == null || ! Hash::check($request->password, $user->password)) {
+            return response(ValidationException::withMessages([
+                'email' => ['El correo no existe en nuestro registro.'],
+                'password' => ['La contraseña no es correcta.'],
+            ])->getMessage(), 401);
         }
         $tokenResult = $user->createToken('authToken');
         $token = $tokenResult->token;
@@ -54,11 +57,14 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
-        return response()->json(['message' =>
-            'Sesion correctamente cerrada.']);
+        return response('Sesion correctamente cerrada.', 200);
     }
 
     public function unauthorized(){
-        return response('Unauthorized, please login and retry', 401);
+        return response('No esta autorizado, por favor loguearse e intentar nuevamente', 401);
+    }
+
+    public function getUser(){
+        return auth()->user();
     }
 }
