@@ -18,7 +18,7 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
         } catch(\Exception $e){
-            return $e->getMessage();
+            return response($e->getMessage(), 400);
         }
         $user = new User([
             'email' => $request->email,

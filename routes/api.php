@@ -19,8 +19,8 @@ Route::group(['prefix' => 'auth'], function() {
 // Las siguientes rutas requieren que el usuario tenga un token válido
 
 Route::group(['middleware' => 'auth:api'], function() {
-    Route::get('search', [GifController::class, 'search']);
-    Route::get('get', [GifController::class, 'get']);
+    Route::post('search', [GifController::class, 'search']);
+    Route::post('get', [GifController::class, 'get']);
     Route::post('save-fav', [GifController::class, 'saveFav']);
     Route::get('user-favs', [GifController::class, 'getUserFavorites']);
 });
