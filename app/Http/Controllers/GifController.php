@@ -87,7 +87,7 @@ class GifController extends Controller
         try {
             $request->validate([
                 'gif_id' => 'required|string',
-                'user_id' => 'required|integer',
+                'user_id' => 'required|integer|exists:user,id',
                 'alias' => 'required|string'
             ]);
         } catch (\Exception $e) {
